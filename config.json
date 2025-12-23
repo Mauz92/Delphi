@@ -1,1 +1,20 @@
-
+{
+  "jellyfin": {
+    "url": "http://192.168.1.100:8096",
+    "api_key": "XXXX",
+    "user": "user123"
+  },
+  "sonarr": {
+    "url": "http://192.168.1.100:8989",
+    "api_key": "YYYY"
+  },
+  "radarr": {
+    "url": "http://192.168.1.100:7878",
+    "api_key": "ZZZZ"
+  },
+  "qbittorrent": {
+    "url": "http://192.168.1.100:8080",
+    "username": "admin",
+    "password": "pass"
+  }
+}
