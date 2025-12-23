@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <div class="row g-4">  <!-- g-4 adds some spacing between columns -->
+    <!-- Jellyfin Column -->
+    <div class="col-8">
+      <section class="jellyfin-section text-start">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <a href="{{JELLYFIN_URL}}">
+          <img src="{{ url_for('static', filename='images/jellyfin.svg') }}"
+              alt="Jellyfin" class="img-fluid" style="width: 20px; height: 20px;">
+          </a>
+          <div>
+            <strong>Jellyfin</strong><br>
+            <small class="text-light">Recently Added</small>
+          </div>
+        </div>
+        <!-- Splide carousel below -->
+        <div id="jellyfin-splide" class="splide mt-3">
+          <div class="splide__track">
+            <ul class="splide__list">
+              {% for item in jellyfin_items %}
+                <li class="splide__slide">
+                  <a href="{{url_for('jellyfin_item', item_id=item.Id)}}">
+                    <img src="{{ item.imageUrl }}" alt="{{ item.Name }}" class="rounded shadow" style="width:150px;">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
+      <!-- Radarr Column -->
+      <section class="radarr-section text-start">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <a href="{{RADARR_URL}}">
+          <img src="{{ url_for('static', filename='images/radarr.svg') }}"
+              alt="Radarr" class="img-fluid" style="width: 20px; height: 20px;">
+          </a>
+          <div>
+            <strong>Radarr</strong><br>
+            <small class="text-light">Recently Added</small>
+          </div>
+        </div>  
+        <!-- Splide carousel below -->
+        <div id="radarr-splide" class="splide mt-3">
+          <div class="splide__track">
+            <ul class="splide__list">
+              {% for m in movies %}
+                <li class="splide__slide">
+                  <a href="{{RADARR_URL}}">
+                    <img src="{{ m.images[0].remoteUrl }}" alt="{{ m.title }}" class="rounded shadow" style="width:150px;">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
+      <section class="qbit-section text-start">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <a href="{{SONARR_URL}}">
+          <img src="{{ url_for('static', filename='images/sonarr.svg') }}"
+              alt="Sonarr" class="img-fluid" style="width: 20px; height: 20px;">
+          </a>
+          <div>
+            <strong>Sonarr</strong><br>
+            <small class="text-light">Recently Added</small>
+          </div>
+        </div>
+        <!-- Splide carousel below -->
+        <div id="sonarr-splide" class="splide mt-3">
+          <div class="splide__track">
+            <ul class="splide__list">
+              {% for s in series %}
+                <li class="splide__slide">
+                  <a href="{{SONARR_URL}}">
+                    <img src="{{ s.images[1].remoteUrl }}" alt="{{ s.title }}" class="rounded shadow" style="width:150px;">
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- Torrents Column -->
+    <div class="col-4">
+      <section class="octoprint-section text-start">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <a href="{{OCTOPRINT_JOB}}">
+          <img src="{{ url_for('static', filename='images/octoprint.svg') }}"
+              alt="Octoprint" class="img-fluid" style="width: 20px; height: 20px;">
+          </a>
+          <div>
+            <strong>Octoprint</strong><br>
+            <small class="text-light">Current job</small>
+          </div>
+        </div>
+        <div id="job-list">
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span>🖨️ {{ octoprint_job.job.file.name or "No active print" }}</span>
+              <span>{{ (octoprint_job.progress.completion or 0) | round(1) }}%</span>
+            </div>
+
+            <div class="progress" style="height: 20px;">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                style="width: {{ (octoprint_job.progress.completion or 0) | round(1) }}%;"
+                aria-valuenow="{{ (octoprint_job.progress.completion or 0) | round(1) }}"
+                aria-valuemin="0"
+                aria-valuemax="100">
+                {{ octoprint_job.progress.completion|round(1)}}%
+              </div>
+            </div>
+            <small class="text-light">
+              State: {{ octoprint_job.state or "Unknown" }}
+              {% if octoprint_job.progress.printTimeLeft %}
+                • Time left: {{ (octoprint_job.progress.printTimeLeft // 60) }} min
+              {% endif %}
+            </small>
+          </div>
+        </div>
+      </section>
+      <section class="qbit-section my-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <img src="{{ url_for('static', filename='images/calendar.svg') }}" alt="Calendar" style="width: 20px; height: 20px;">
+          <div>
+            <strong>Upcoming Releases</strong><br>
+            <small class="text-light">Movies & Shows</small>
+          </div>
+        </div>
+        <div id="calendar" style="height: 600px;"></div>
+      </section>
+      <section class="qbit-section text-start">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <a href="{{QBITTORRENT_URL}}">
+          <img src="{{ url_for('static', filename='images/qbittorrent.svg') }}"
+              alt="Qbittorrent" class="img-fluid" style="width: 20px; height: 20px;">
+          </a>
+          <div>
+            <strong>Qbittorrent</strong><br>
+            <small class="text-light">Active Torrents</small>
+          </div>
+        </div>
+        <div id="torrent-list">
+          {% for t in torrents %}
+            <div class="mb-2">
+              <div class="d-flex justify-content-between">
+                <span>{{ t.name }}</span>
+                <span>{{ (t.progress * 100)|round(1) }}%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar 
+                            {% if t.state == 'downloading' %}bg-primary
+                            {% elif t.state == 'seeding' %}bg-success
+                            {% elif t.state == 'paused' %}bg-secondary
+                            {% else %}bg-info{% endif %}"
+                    role="progressbar"
+                    style="width: {{ t.progress * 100 }}%;"
+                    aria-valuenow="{{ t.progress * 100 }}"
+                    aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+      <section class="qbit-section text-start">
+        <strong>Disk Usage</strong>
+        {% for d in diskspace %}
+        {% set used = (1 - (d.freeSpace / d.totalSpace)) * 100 %}
+        <div class="mb-3">
+          <p class="mb-1"><strong>{{ d.path }}</strong> — {{d.freeSpace}} GB free of {{ d.totalSpace}} GB</p>
+          <div class="progress" style="height: 20px;">
+            <div class="progress-bar {% if used > 90 %}bg-danger{% elif used > 75 %}bg-warning{% else %}bg-success{% endif %}"
+                role="progressbar"
+                style="width: {{ used|round(1) }}%;"
+                aria-valuenow="{{ used|round(1) }}"
+                aria-valuemin="0"
+                aria-valuemax="100">
+              {{ used|round(1) }}%
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </section>
+    </div>
+  </div> <!-- /.row -->
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  new Splide('#jellyfin-splide', {
+    type: 'loop',
+    drag: 'free',
+    gap: '10rem',
+    perPage: 6,
+    arrows: false,
+    pagination: false,
+  }).mount(); 
+
+  new Splide('#radarr-splide', {
+    type: 'loop',
+    drag: 'free',
+    gap: '10rem',
+    perPage: 6,
+    arrows: false,
+    pagination: false,
+  }).mount();
+
+  new Splide('#sonarr-splide', {
+    type: 'loop',
+    drag: 'free',
+    gap: '10rem',
+    perPage: 6,
+    arrows: false,
+    pagination: false,
+  }).mount();
+});
+
+  async function updateTorrents() {
+    try {
+      const res = await fetch("/api/torrents");
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const container = document.getElementById("torrent-list");
+      container.innerHTML = "";  // clear old content
+
+      data.forEach(t => {
+        const div = document.createElement("div");
+        div.className = "mb-2";
+
+        // determine progress bar color
+        let colorClass = "bg-info";
+        if (t.state === "downloading") colorClass = "bg-primary";
+        else if (t.state === "seeding") colorClass = "bg-success";
+        else if (t.state === "paused") colorClass = "bg-secondary";
+
+        div.innerHTML = `
+          <div class="d-flex justify-content-between">
+            <span>${t.name}</span>
+            <span>${(t.progress * 100).toFixed(1)}%</span>
+          </div>
+          <div class="progress">
+            <div class="progress-bar ${colorClass}" role="progressbar"
+                style="width: ${(t.progress * 100).toFixed(1)}%;"
+                aria-valuenow="${(t.progress * 100).toFixed(1)}"
+                aria-valuemin="0" aria-valuemax="100">
+            </div>
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Error fetching torrents:", err);
+    }
+  }
+
+  // update every 5 seconds
+  setInterval(updateTorrents, 5000);
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'listMonth',
+      themeSystem: 'bootstrap5',
+      events: '/api/calendar', // <-- load events from your Flask endpoint
+      eventTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        meridiem: false
+      },
+      loading: function(isLoading) {
+        if (isLoading) {
+          console.log("Loading events...");
+        } else {
+          console.log("Events loaded.");
+        }
+      }
+    });
+
+    calendar.render();
+  });
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-md-4">
+      <img src="{{ item.imageUrl }}" alt="{{ item.Name }}" class="img-fluid rounded shadow">
+    </div>
+    <div class="col-md-8 text-light">
+      <h1>{{ item.Name }}</h1>
+      <p><strong>Year:</strong> {{ item.ProductionYear }}</p>
+      <p><strong>Critic Rating:</strong> {{ item.CriticRating or 'N/A' }}%</p>
+      <p><strong>Runtime:</strong> {{ (item.RunTimeTicks // 10000000) // 60 }} minutes</p>
+      <p><strong>Description:</strong> {{ item.Overview or "No description available." }}</p>
+
+      <a href="{{ JELLYFIN_URL }}/web/index.html#!/details?id={{ item.Id }}"
+         class="btn btn-primary mt-3" target="_blank">
+        ▶️ Play in Jellyfin
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

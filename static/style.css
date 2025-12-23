@@ -1,0 +1,70 @@
+body {
+  font-family: sans-serif;
+  background: #101010;
+  color: #ddd;
+  padding: 20px;
+}
+
+section {
+  margin-bottom: 2em;
+  padding: 1em;
+}
+
+.movie img {
+  width: 100px;
+  border-radius: 8px;
+}
+
+.radarr-section {
+  border-radius: 10px;
+  background: white;
+  background: linear-gradient(130deg, rgba(227, 179, 5, .7) 0%, rgba(60, 60, 60, .2) 70%, rgba(0, 0, 0, 0) 100%)
+}
+
+.jellyfin-section {
+  border-radius: 10px;
+  background: white;
+  background: linear-gradient(130deg, rgba(105, 5, 227, .7) 0%, rgba(60, 60, 60, .2) 70%, rgba(0, 0, 0, 0) 100%)
+}
+
+.qbit-section {
+  border-radius: 10px;
+  background: white;
+  background: linear-gradient(130deg, rgba(43, 170, 224, .7) 0%, rgba(60, 60, 60, .2) 70%, rgba(0, 0, 0, 0) 100%)
+}
+
+.octoprint-section {
+  border-radius: 10px;
+  background: white;
+  background: linear-gradient(130deg, rgba(37, 163, 18, .7) 0%, rgba(60, 60, 60, .2) 70%, rgba(0, 0, 0, 0) 100%)
+}
+
+body {
+  background-image: url("./images/bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #fff;
+}
+
+.tui-full-calendar-weekday-grid,
+.tui-full-calendar-monthday-grid {
+  font-family: 'Inter', sans-serif;
+  background-color: #1a1a1a;
+  color: #eee;
+}
+
+.tui-full-calendar-schedule {
+  border-radius: 8px !important;
+  padding: 2px 4px !important;
+  font-size: 0.85rem;
+}
+
+.tui-full-calendar-weekday-grid .tui-full-calendar-weekday-grid-date {
+  color: #ffeb3b;
+}
+
+.tui-full-calendar-dayname {
+  background-color: #333 !important;
+  color: #fff !important;
+}
