@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "jellyfin",
+      "url": "http://localhost:8096",
+      "api_key": ""
+    }
+  ]
+}
