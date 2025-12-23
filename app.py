@@ -74,7 +74,7 @@ def calendar_data():
             events.append({
                 "title": title,
                 "start": ep["airDate"],
-                "color": "#17a2b7",
+                "color": "#17a2b8",
                 "source": "Sonarr"
             })
     except Exception as e:
