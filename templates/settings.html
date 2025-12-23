@@ -1,0 +1,137 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">App Settings</h3>
+        </div>
+        <div class="card-body">
+          <!-- Settings form -->
+          <form method="POST" class="mb-4">
+            <div class="mb-3">
+              <label for="app_name" class="form-label">App Name</label>
+              <input type="text" class="form-control" id="app_name" name="app_name" placeholder="e.g. jellyfin" required>
+            </div>
+            <div class="mb-3">
+              <label for="url" class="form-label">URL</label>
+              <input type="text" class="form-control" id="url" name="url" placeholder="http://localhost:8096">
+            </div>
+            <div class="mb-3">
+              <label for="api_key" class="form-label">API Key</label>
+              <input type="text" class="form-control" id="api_key" name="api_key">
+            </div>
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username" name="username">
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password">
+            </div>
+            <button type="submit" class="btn btn-success">Save Settings</button>
+          </form>
+
+          <!-- Display current config -->
+            <h5>Current Config</h5>
+            <ul class="list-group mb-3">
+              {% for app_name, app_config in config.items() %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{{ app_name }}</strong> – {{ app_config.url }}
+                  </div>
+                  <div>
+                    <button class="btn btn-sm btn-info view-app-btn" data-app='{{ app_config | tojson | safe }}'>View Info</button>
+                    <button class="btn btn-sm btn-danger delete-btn" data-app="{{ app_name }}">Delete</button>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          </pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Dynamic App Info Modal -->
+<div class="modal fade" id="appInfoModal" tabindex="-1" aria-labelledby="appInfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="appInfoModalLabel">App Info</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="appInfoModalBody">
+        <!-- Dynamic content injected here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const appName = btn.dataset.app;
+      if (!confirm(`Delete configuration for ${appName}?`)) return;
+
+      try {
+        const res = await fetch(`/settings/delete/${appName}`, { method: "POST" });
+        const data = await res.json();
+        if (data.success) {
+          // Remove the list item from DOM
+          btn.closest("li").remove();
+        } else {
+          alert("Failed to delete entry: " + data.error);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error deleting entry");
+      }
+    });
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const modalEl = document.getElementById("appInfoModal");
+  const modalBody = document.getElementById("appInfoModalBody");
+
+  document.querySelectorAll(".view-app-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const appConfig = JSON.parse(btn.dataset.app);
+
+      // Clear previous content
+      modalBody.innerHTML = "";
+
+      // App name
+      const title = document.createElement("h5");
+      title.textContent = appConfig.app_name || "App";
+      modalBody.appendChild(title);
+
+      // Dynamically add all attributes
+      for (const [key, value] of Object.entries(appConfig)) {
+        // Skip empty or irrelevant fields if you want
+        if (!value) continue;
+
+        const row = document.createElement("p");
+        row.innerHTML = `<strong>${key}:</strong> ${value}`;
+        modalBody.appendChild(row);
+      }
+
+      // Show modal
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    });
+  });
+});
+</script>
+{% endblock %}
+

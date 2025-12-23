@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import requests
 from services.radarr import get_recent_movies, get_diskspace
 from services.sonarr import get_recent_series
@@ -8,7 +8,10 @@ from services.octoprint import get_current_job
 from config import JELLYFIN_URL, OCTOPRINT_URL, RADARR_URL, SONARR_URL, QBITTORRENT_URL
 from config import RADARR_API_KEY, SONARR_API_KEY
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import json
 
+CONFIG_PATH = Path("config.json")
 app = Flask(__name__)
 
 @app.route("/")
@@ -97,6 +100,48 @@ def calendar_data():
     except Exception as e:
         print(f"Radarr calendar error: {e}")
     return jsonify(events)
+
+def load_config():
+    if CONFIG_PATH.exists():
+        with open(CONFIG_PATH, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_config(config):
+    with open(CONFIG_PATH, "w") as f:
+        json.dump(config, f, indent=4)
+
+@app.route("/settings", methods=["GET", "POST"])
+def settings():
+    config = load_config()
+    if request.method == "POST":
+        app_name = request.form.get("app_name")
+        print(app_name)
+        url = request.form.get("url")
+        api_key = request.form.get("api_key")
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Dynamically update config
+        config[app_name] = {}
+        if url: config[app_name]["url"] = url
+        if api_key: config[app_name]["api_key"] = api_key
+        if username: config[app_name]["username"] = username
+        if password: config[app_name]["password"] = password
+
+        save_config(config)
+        # return "Config updated successfully!"
+
+    return render_template("settings.html", config=config)
+
+@app.route("/settings/delete/<app_name>", methods=["POST"])
+def delete_setting(app_name):
+    config = load_config()
+    if app_name in config:
+        del config[app_name]
+        save_config(config)
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "Not found"}), 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
