@@ -105,6 +105,9 @@ def load_config():
     if CONFIG_PATH.exists():
         with open(CONFIG_PATH, "r") as f:
             return json.load(f)
+    else: 
+        with open(CONFIG_PATH, 'w') as f:
+            json.dump({}, f, indent=2)
     return {}
 
 def save_config(config):
